@@ -17,31 +17,20 @@ export class MultilanguageText {
   constructor(
     defaultLocale: string,
     defaultText: string,
-    variant?: MultilanguageTextVariant
+    variant: MultilanguageTextVariant = MultilanguageTextVariant.TEXT,
+    translations: Translation[] = []
   ) {
-    (this.defaultLocale = defaultLocale),
-      (this.defaultText = defaultText),
-      (this.variant = variant || MultilanguageTextVariant.TEXT),
-      (this.translations = []);
+    this.defaultLocale = defaultLocale;
+    this.defaultText = defaultText;
+    this.variant = variant;
+    this.translations = translations;
   }
 
-  addTranslation(localeToAdd: string, textToAdd: string) {
-    const index = this.translations.findIndex((t) => t.locale === localeToAdd);
+  addTranslation(locale: string, text: string) {
+    const index = this.translations.findIndex((t) => t.locale === locale);
     if (index === -1) {
-      const translation: Translation = {
-        locale: localeToAdd,
-        text: textToAdd,
-      };
-      this.translations.push(translation);
+      this.translations.push({ locale, text });
     }
-  }
-
-  getDefaultTranslation() {
-    const defaultTranslation: Translation = {
-      locale: this.defaultLocale,
-      text: this.defaultText,
-    };
-    return defaultTranslation;
   }
 
   getAllTranslations() {
@@ -54,38 +43,33 @@ export class MultilanguageText {
     return allTranslations;
   }
 
-  getTranslationForLocale(localeToFind: string) {
-    if (localeToFind === this.defaultLocale) {
+  getTranslation(locale: string, getDefaultIfLocaleNotFound: boolean = false) {
+    if (locale === this.defaultLocale) {
       return { locale: this.defaultLocale, text: this.defaultText };
     }
-    const index = this.translations.findIndex((t) => t.locale === localeToFind);
+    const index = this.translations.findIndex((t) => t.locale === locale);
     if (index !== -1) {
       return this.translations[index];
+    }
+    if (getDefaultIfLocaleNotFound) {
+      return { locale: this.defaultLocale, text: this.defaultText };
     }
     return null;
   }
 
-  getTranslationForLocaleOrDefault(localeToFind: string) {
-    const translation = this.getTranslationForLocale(localeToFind);
-    if (translation === null) {
-      return { locale: this.defaultLocale, text: this.defaultText };
-    }
-    return translation;
-  }
-
-  modifyTranslation(localeToModify: string, modifiedText: string) {
-    const index = this.translations.findIndex(
-      (t) => t.locale === localeToModify
-    );
-    if (index !== -1) {
-      this.translations[index].text = modifiedText;
+  modifyTranslation(locale: string, text: string) {
+    if (locale === this.defaultLocale) {
+      this.defaultText = text;
+    } else {
+      const index = this.translations.findIndex((t) => t.locale === locale);
+      if (index !== -1) {
+        this.translations[index].text = text;
+      }
     }
   }
 
-  removeTranslation(localeToRemove: string) {
-    const index = this.translations.findIndex(
-      (t) => t.locale === localeToRemove
-    );
+  removeTranslation(locale: string) {
+    const index = this.translations.findIndex((t) => t.locale === locale);
     if (index !== -1) {
       this.translations.splice(index, 1);
     }

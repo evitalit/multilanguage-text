@@ -34,5 +34,9 @@
     "rimraf": "^5.0.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^9.1.2",
+    "ts-node": "^10.9.1"
   }
 }

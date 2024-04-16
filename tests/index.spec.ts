@@ -1,8 +1,4 @@
-import {
-  MultilanguageText,
-  MultilanguageTextVariant,
-  Translation,
-} from "../src/index";
+import { MultilanguageText, MultilanguageTextVariant } from "../src/index";
 
 test("Create multilanguage text with default settings (variant: text)", () => {
   const area = new MultilanguageText("en-us", "Vision");
@@ -40,15 +36,6 @@ test("Fail to add translation for existing locale", () => {
   expect(area.translations[0].text).toBe("Jövőkép");
 });
 
-test("Get translation for default locale", () => {
-  const area = new MultilanguageText("en-us", "Vision");
-  area.addTranslation("hu-hu", "Jövőkép");
-  area.addTranslation("de-de", "Vision");
-  const defaultTranslation = area.getDefaultTranslation();
-  expect(defaultTranslation.locale).toBe("en-us");
-  expect(defaultTranslation.text).toBe("Vision");
-});
-
 test("Get all translations", () => {
   const area = new MultilanguageText("en-us", "Vision");
   area.addTranslation("hu-hu", "Jövőkép");
@@ -57,11 +44,20 @@ test("Get all translations", () => {
   expect(translations.length).toBe(3);
 });
 
-test("Get translation for existing locale", () => {
+test("Get translation for existing locale (default)", () => {
   const area = new MultilanguageText("en-us", "Vision");
   area.addTranslation("hu-hu", "Jövőkép");
   area.addTranslation("de-de", "Vision");
-  const translation = area.getTranslationForLocale("hu-hu");
+  const translation = area.getTranslation("en-us");
+  expect(translation?.locale).toBe("en-us");
+  expect(translation?.text).toBe("Vision");
+});
+
+test("Get translation for existing locale (non-default)", () => {
+  const area = new MultilanguageText("en-us", "Vision");
+  area.addTranslation("hu-hu", "Jövőkép");
+  area.addTranslation("de-de", "Vision");
+  const translation = area.getTranslation("hu-hu");
   expect(translation?.locale).toBe("hu-hu");
   expect(translation?.text).toBe("Jövőkép");
 });
@@ -69,19 +65,27 @@ test("Get translation for existing locale", () => {
 test("Fail to get translation for nonexisting locale", () => {
   const area = new MultilanguageText("en-us", "Vision");
   area.addTranslation("hu-hu", "Jövőkép");
-  const translation = area.getTranslationForLocale("de-de");
+  const translation = area.getTranslation("de-de");
   expect(translation).toBeNull();
 });
 
 test("Get default translation for nonexisting locale", () => {
   const area = new MultilanguageText("en-us", "Vision");
   area.addTranslation("hu-hu", "Jövőkép");
-  const translation = area.getTranslationForLocaleOrDefault("de-de");
+  const translation = area.getTranslation("de-de", true);
   expect(translation?.locale).toBe("en-us");
   expect(translation?.text).toBe("Vision");
 });
 
-test("Modify translation for existing locale", () => {
+test("Modify translation for existing locale (default)", () => {
+  const area = new MultilanguageText("en-us", "Vision");
+  area.addTranslation("hu-hu", "Jövőkép");
+  area.modifyTranslation("de-de", "Vision");
+  expect(area.defaultLocale).toBe("de-de");
+  expect(area.defaultText).toBe("Vision");
+});
+
+test("Modify translation for existing locale (non-default)", () => {
   const area = new MultilanguageText("en-us", "Vision");
   area.addTranslation("hu-hu", "Jövőkép");
   area.addTranslation("de-de", "Vision");
